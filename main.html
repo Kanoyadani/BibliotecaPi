@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div >
+        <button id="AddBook" onclick="addbook()">Add Book</button>
+        <button id="addaluno" onclick="addaluno()">Add Studant</button>
+        <button id="Busca" onclick="buscabook()">Find Book</button>
+        <div id="formadd">
+            <form id="formbook">
+               <h3>Novo Aluno</h3>
+              <input type="text" name="titlebook" id="titlebook">
+              <br>
+               <h3>Novo Autor</h3>
+              <input type="text" name="authorbook" id="authorbook">
+              <br>
+              <h3>Categoria</h3>
+              <input type="text" name="Categoria" id="Categoria">
+              <br>
+              <button type="submit">New book</button>
+          </form>
+        </div>
+
+        <div id="addalunocreate">
+            <form id="formaluno">
+           <h3>Novo Aluno</h3>
+              <input type="text" name="nomealuno" id="nomealuno">
+              <br>
+               <h3>Email</h3>
+              <input type="text" name="email" id="email">
+              <br>
+              <h3>Matricula</h3>
+              <input type="text" name="matricula" id="matricula">
+              <br>
+              <h3>Serie</h3>
+              <input type="text" name="serie" id="serie">
+              <br>
+              <h3>Data registro</h3>
+              <input type="date" name="registro" id="registro">
+              <br>
+              <br>
+              <button type="submit">Novo Aluno</button>
+            </form>
+        </div>
+
+        <div id="formbausca">
+            <form id="formSearchBook">
+               <h3>Name Book</h3>
+               <input type="text" id="searchBook" autocomplete="off">
+               <ul id="suggestions"></ul>
+               <button id="btnLend" type="submit" style="display:none"> Emprestar</button>
+        </div>
+    </div>
+<script src="main.js"></script>    
+</body>
+</html>
