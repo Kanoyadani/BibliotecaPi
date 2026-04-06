@@ -1,29 +1,144 @@
-#formadd {
-display: none;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#formbausca{
-    display: none;
+
+body {
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 5vh;
 }
 
-#addalunocreate{
-    display: none;
+
+body > div {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+
+form {
+    text-align: left;
+    width: 100%;
+}
+
+h3 {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+
+input[type="text"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+
+#formadd,
+#addalunocreate,
+#formbausca {
+    display: none; 
+    flex-direction: column;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 }
 
 
 #suggestions {
-  border: 1px solid #ccc;
-  max-width: 300px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 0 0 5px 5px;
+    background-color: #fff;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
 #suggestions li {
-  padding: 6px;
-  cursor: pointer;
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+#suggestions li:last-child {
+    border-bottom: none;
 }
 
 #suggestions li:hover {
-  background: #eee;
+    background: #f8f9fa;
+    color: #007bff;
+}
+
+
+#btnLend {
+    margin-top: 15px;
+    background-color: #28a745;
+    width: 100%;
+}
+
+#btnLend:hover {
+    background-color: #218838;
+}
+
+form button[type="submit"] {
+    margin-top: 20px;
+    width: 100%;
+    background-color: #17a2b8;
+}
+
+form button[type="submit"]:hover {
+    background-color: #138496;
 }
