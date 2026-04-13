@@ -22,81 +22,13 @@ function addaluno() {
 
 // ================== DOM READY ==================
 document.addEventListener("DOMContentLoaded", () => {
-
   esconderTudo();
 
-  // ================== ADD BOOK ==================
-  const formBook = document.getElementById("formbook");
-  const formAdd = document.getElementById("formadd");
-
-  if (formBook) {
-    formBook.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const dados = {
-        title: document.getElementById("titlebook").value,
-        author: document.getElementById("authorbook").value,
-        Category: document.getElementById("Categoria").value
-      };
-
-      try {
-        const response = await fetch("http://localhost:3000/livros", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dados)
-        });
-
-        if (!response.ok) throw new Error();
-
-        alert("📘 Livro cadastrado com sucesso!");
-        formBook.reset();
-        formAdd.style.display = "none";
-
-      } catch {
-        alert("❌ Erro ao cadastrar livro");
-      }
-    });
-  }
-
-  // ================== ADD ALUNO ==================
-  const formAluno = document.getElementById("formaluno");
-  const formAddAluno = document.getElementById("addalunocreate");
-
-  if (formAluno) {
-    formAluno.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const dados = {
-        nome: document.getElementById("nomealuno").value,
-        email: document.getElementById("email").value,
-        matricula: document.getElementById("matricula").value,
-        serie: document.getElementById("serie").value,
-        registro: document.getElementById("registro").value
-      };
-
-      try {
-        const response = await fetch("http://localhost:3000/alunos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dados)
-        });
-
-        if (!response.ok) throw new Error();
-
-        alert("👨‍🎓 Aluno cadastrado com sucesso!");
-        formAluno.reset();
-        formAddAluno.style.display = "none";
-
-      } catch {
-        alert("❌ Erro ao cadastrar aluno");
-      }
-    });
-  }
-
-  // ================== AUTOCOMPLETE ==================
   const input = document.getElementById("searchBook");
   const list = document.getElementById("suggestions");
   const btnLend = document.getElementById("btnLend");
+
+  let selectedBook = null;
 
   if (input && list && btnLend) {
     input.addEventListener("input", async () => {
@@ -108,32 +40,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         const res = await fetch(`http://localhost:3000/livros?q=${value}`);
-        if (!res.ok) throw new Error();
-
         const books = await res.json();
 
-        if (books.length === 0) {
-          alert("📚 Livro não encontrado");
-          return;
-        }
-
-        books.forEach(book => {
+        books.forEach((book) => {
           const li = document.createElement("li");
-          li.textContent = book.title;
-
+          li.textContent = book.title + " IdLivro: " + book.idbook;
           li.addEventListener("click", () => {
             input.value = book.title;
             list.innerHTML = "";
             btnLend.style.display = "block";
+            selectedBook = book;
           });
-
           list.appendChild(li);
         });
-
       } catch {
         alert("❌ Erro ao buscar livros");
       }
     });
-  }
 
+    btnLend.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (!selectedBook) return alert("⚠️ Selecione um livro");
+      if (selectedBook.emprestador) return alert("❌ Livro já emprestado!");
+
+      const formemp = document.getElementById("formemp");
+      formemp.style.display = "block";
+      document.getElementById("idbooksave").value = selectedBook.idbook;
+
+      const btnEmp = document.getElementById("btnemp");
+
+      btnEmp.onclick = async (e) => {
+        e.preventDefault();
+        const matricula = document
+          .getElementById("matriculaAlunoinf")
+          .value.trim();
+        if (!matricula) return alert("Informe uma matrícula válida");
+
+        try {
+          const res = await fetch(
+            `http://localhost:3000/alunos?q=${matricula}`,
+          );
+          const alunos = await res.json();
+          if (alunos.length === 0) return alert("Aluno não encontrado");
+
+          const alunoSelecionado = alunos[0];
+
+          const dados = {
+            idbook: selectedBook.idbook,
+            nome_aluno: alunoSelecionado.nome,
+            email: alunoSelecionado.email,
+            matricula: alunoSelecionado.matricula,
+            serie: alunoSelecionado.serie,
+            data_emprestimo: new Date(),
+            data_devolucao: null,
+          };
+
+          // salvar empréstimo
+          const emprestimoRes = await fetch(
+            "http://localhost:3000/emprestimoservice",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados),
+            },
+          );
+          if (!emprestimoRes.ok) throw new Error();
+
+          await fetch(`http://localhost:3000/livros/${selectedBook.idbook}`, {
+            method: "PATCH",
+          });
+          selectedBook.emprestador = true;
+
+          alert(`📚 Livro emprestado para ${alunoSelecionado.nome}!`);
+
+          document.getElementById("matriculaAlunoinf").value = "";
+          formemp.style.display = "none";
+        } catch (err) {
+          console.error(err);
+          alert("❌ Erro ao emprestar livro");
+        }
+      };
+    });
+  }
 });
