@@ -20,7 +20,7 @@
               <input type="text" name="authorbook" id="authorbook">
               <br>
               <h3>Categoria</h3>
-              <input type="text" name="Categoria" id="Categoria">
+              <input type="text" id="category">
               <br>
               <button type="submit">New book</button>
           </form>
@@ -54,6 +54,17 @@
                <input type="text" id="searchBook" autocomplete="off">
                <ul id="suggestions"></ul>
                <button id="btnLend" type="submit" style="display:none"> Emprestar</button>
+        </div>
+
+        <div id="formemp" style="display: none;">
+            <form id="formemppost" method="post">
+                <h3>Emprestimo</h3> <br>
+            <h4>IdLivro</h4>
+            <input type="number" id="idbooksave" readonly>
+            <h4 id="matriiculaalunosave">Matricula</h4>
+            <input type="number" id="matriculaAlunoinf">  <br>
+            <button type="button" id="btnemp">Emprestar</button>
+            </form>
         </div>
     </div>
 <script src="main.js"></script>    
