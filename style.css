@@ -142,3 +142,49 @@ form button[type="submit"] {
 form button[type="submit"]:hover {
     background-color: #138496;
 }
+
+/* ================= DEVOLVER ================= */
+
+#formdev {
+    display: none;
+    flex-direction: column;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+#devlivro {
+    background-color: #dc3545;
+    width: 100%;
+}
+
+#devlivro:hover {
+    background-color: #b02a37;
+}
+
+/* ================= AJUSTE INPUT DEVOLVER ================= */
+
+input[type="text"],
+input[type="date"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+#formdev input {
+    margin-bottom: 10px;
+}
+
+/* mantém o botão vermelho bonitão */
+#devlivro {
+    background-color: #dc3545;
+    width: 100%;
+}
+
+#devlivro:hover {
+    background-color: #b02a37;
+}

@@ -20,6 +20,11 @@ function addaluno() {
   document.getElementById("addalunocreate").style.display = "flex";
 }
 
+function devolver(){
+  esconderTudo();
+  document.getElementById("formdev").style.display = "flex"
+}
+
 // ================== DOM READY ==================
 document.addEventListener("DOMContentLoaded", () => {
   esconderTudo();
@@ -215,4 +220,33 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     });
   }
+
+  // ================== DEVOLVER LIVRO ==================
+const btnDevolver = document.getElementById("devlivro");
+
+if (btnDevolver) {
+  btnDevolver.addEventListener("click", async () => {
+    const id = document.getElementById("IDlivrodev").value.trim();
+
+    if (!id) {
+      return alert("Informe o ID do livro");
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/devolver/${id}`, {
+        method: "PATCH",
+      });
+
+      if (!res.ok) throw new Error();
+
+      alert("📚 Livro devolvido com sucesso!");
+
+      document.getElementById("IDlivrodev").value = "";
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ Erro ao devolver livro");
+    }
+  });
+}
 });

@@ -11,9 +11,10 @@
         <button id="AddBook" onclick="addbook()">Add Book</button>
         <button id="addaluno" onclick="addaluno()">Add Studant</button>
         <button id="Busca" onclick="buscabook()">Find Book</button>
+        <button id="devolver" onclick="devolver()">Devolver</button>
         <div id="formadd">
             <form id="formbook">
-               <h3>Novo Aluno</h3>
+               <h3>Novo Livro</h3>
               <input type="text" name="titlebook" id="titlebook">
               <br>
                <h3>Novo Autor</h3>
@@ -64,6 +65,13 @@
             <h4 id="matriiculaalunosave">Matricula</h4>
             <input type="number" id="matriculaAlunoinf">  <br>
             <button type="button" id="btnemp">Emprestar</button>
+            </form>
+        </div>
+
+        <div id="formdev" style="display: none;">
+            <form method="post" id="formpostdev">
+                <input type="number" name="IdLivro" id="IDlivrodev">
+                <button type="button" id="devlivro">Devolver Livro</button>
             </form>
         </div>
     </div>

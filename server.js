@@ -103,6 +103,40 @@ app.post("/emprestimoservice", async (req, res) => {
   }
 });
 
+// ================= DEVOLVER LIVRO =================
+app.patch("/devolver/:id", async (req, res) => {
+  const idbook = req.params.id;
+
+  try {
+    // 1. Atualiza o livro (remove status de emprestado)
+    await pool.query(
+      `UPDATE books
+       SET emprestador = false
+       WHERE idbook = $1`,
+      [idbook]
+    );
+
+    // 2. Atualiza o empréstimo (coloca data de devolução)
+    const result = await pool.query(
+      `UPDATE emprestimos
+       SET data_devolucao = NOW()
+       WHERE idbook = $1 AND data_devolucao IS NULL
+       RETURNING *`,
+      [idbook]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Empréstimo não encontrado" });
+    }
+
+    res.json({ message: "Livro devolvido com sucesso!" });
+
+  } catch (err) {
+    console.error("❌ ERRO DEVOLUÇÃO 👉", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ================= START =================
 app.listen(3000, () => {
   console.log("🚀 Servidor rodando em http://localhost:3000");
