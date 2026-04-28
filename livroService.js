@@ -1,14 +1,21 @@
-const pool = require('./db');
+const pool = require("./db");
 
-async function criarLivro({ title, author,Category }) {
+async function criarLivro({ title, author, category, quantidade, emprestador = false }) {
   const sql = `
-    INSERT INTO Books (title, author,Category)
-    VALUES ($1, $2, $3)
+    INSERT INTO books (title, author, Category, quantidade, emprestador)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *;
   `;
+  
+  const result = await pool.query(sql, [
+    title,
+    author,
+    category,
+    quantidade || 1, // Se não vier quantidade, define 1 por padrão
+    emprestador,
+  ]);
 
-  const result = await pool.query(sql, [title, author,Category]);
   return result.rows[0];
 }
 
-module.exports = { criarLivro};
+module.exports = { criarLivro };

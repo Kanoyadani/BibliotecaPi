@@ -3,35 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sistema de Controle Bibliotecario</title>
+    <title>Sistema de Controle Bibliotecário</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div id="header-placeholder"></div>
-    <div>
-      <button id="AddBook" onclick="addbook()">Adicionar Livros</button>
-      <button id="addaluno" onclick="addaluno()">Adicionar Estudantes</button>
-      <button id="Busca" onclick="buscabook()">Procurar Livros</button>
+
+    <div class="main-container">
+      <div class="nav-buttons">
+        <button id="AddBook" onclick="addbook()">📚 Novo Livro</button>
+        <button id="addaluno" onclick="addaluno()">👨‍🎓 Novo Aluno</button>
+        <button id="Busca" onclick="buscabook()">🤝 Empréstimo</button>
+        <button id="devolver" onclick="devolver()">↩️ Devolução</button>
+        <button id="Listagem" onclick="verListagem()">📋 Listagem Geral</button>
+      </div>
+
+      <div id="toast"></div>
+
       <div id="formadd">
         <form id="formbook">
-          <h3>Novo Livro</h3>
-          <input
-            type="text"
-            name="titlebook"
-            id="titlebook"
-            placeholder="Título do Livro"
-          />
-          <br />
-          <h3>Novo Autor</h3>
-          <input
-            type="text"
-            name="authorbook"
-            id="authorbook"
-            placeholder="Nome do Autor"
-          />
-          <br />
-          <h3>Categoria</h3>
-          <select id="CategoriaSelect" onchange="toggleOutroInput()">
+          <h3>📘 Novo Livro</h3>
+          <input type="text" id="titlebook" placeholder="Título do Livro" required />
+          
+          <h3>✍️ Autor</h3>
+          <input type="text" id="authorbook" placeholder="Nome do Autor" required />
+          
+          <h3>🔢 Quantidade</h3>
+          <input type="number" id="quantidadelivro" placeholder="Ex: 5" min="1" value="1" required />
+          
+          <h3>📂 Categoria</h3>
+          <select id="CategoriaSelect" onchange="toggleOutroInput()" required>
             <option value="" disabled selected>Selecione uma categoria</option>
             <optgroup label="Ficção">
               <option value="Romance">Romance</option>
@@ -45,21 +46,15 @@
               <option value="Novela">Novela</option>
             </optgroup>
             <optgroup label="Não Ficção">
-              <option value="Biografia/Autobiografia">
-                Biografia/Autobiografia
-              </option>
+              <option value="Biografia/Autobiografia">Biografia/Autobiografia</option>
               <option value="Autoajuda">Autoajuda</option>
               <option value="Didáticos">Didáticos</option>
               <option value="Religiosos">Religiosos</option>
-              <option value="História/Política/Filosofia">
-                História/Política/Filosofia
-              </option>
+              <option value="História/Política/Filosofia">História/Política/Filosofia</option>
             </optgroup>
             <optgroup label="Outros Gêneros">
               <option value="Poesia/Lírico">Poesia/Lírico</option>
-              <option value="Histórias em Quadrinhos (HQs/Mangás)">
-                Histórias em Quadrinhos (HQs/Mangás)
-              </option>
+              <option value="Histórias em Quadrinhos (HQs/Mangás)">Histórias em Quadrinhos (HQs/Mangás)</option>
               <option value="Teatro (Dramático)">Teatro (Dramático)</option>
             </optgroup>
             <option value="Outro">Outro</option>
@@ -67,11 +62,7 @@
 
           <div id="outroCategoriaDiv" style="display: none; margin-top: 10px">
             <h3>Especifique a Categoria</h3>
-            <input
-              type="text"
-              id="CategoriaOutro"
-              placeholder="Digite o gênero"
-            />
+            <input type="text" id="CategoriaOutro" placeholder="Digite o gênero" />
           </div>
 
           <button type="submit">Cadastrar Livro</button>
@@ -80,59 +71,101 @@
 
       <div id="addalunocreate">
         <form id="formaluno">
-          <h3>Novo Aluno</h3>
-          <input type="text" name="nomealuno" id="nomealuno" />
-          <br />
-          <h3>Email</h3>
-          <input type="text" name="email" id="email" />
-          <br />
-          <h3>Matricula</h3>
-          <input type="text" name="matricula" id="matricula" />
-          <br />
-          <h3>Série</h3>
-          <input type="text" name="serie" id="serie" />
-          <br />
-          <h3>Data registro</h3>
-          <input type="date" name="registro" id="registro" />
-          <br />
-          <br />
-          <button type="submit">Novo Aluno</button>
+          <h3>👨‍🎓 Novo Aluno</h3>
+          <input type="text" id="nomealuno" placeholder="Nome completo" required />
+          
+          <h3>📧 Email</h3>
+          <input type="email" id="email" placeholder="email@exemplo.com" required />
+          
+          <h3>🆔 Matrícula</h3>
+          <input type="text" id="matricula" placeholder="Número da matrícula" required />
+          
+          <h3>🏫 Série</h3>
+          <input type="text" id="serie" placeholder="Ex: 2º Ano B" required />
+          
+          <h3>📅 Data de Registro</h3>
+          <input type="date" id="registro" required />
+          
+          <button type="submit">Cadastrar Aluno</button>
         </form>
       </div>
 
       <div id="formbausca">
         <form id="formSearchBook">
-          <h3>Nome do Livro</h3>
-          <input
-            type="text"
-            id="searchBook"
-            placeholder="Digite o nome do livro..."
-            autocomplete="off"
-          />
+          <h3>🔍 Pesquisar Livro</h3>
+          <input type="text" id="searchBook" placeholder="Digite o título..." autocomplete="off" />
           <ul id="suggestions"></ul>
 
-          <div
-            id="areaEmprestimo"
-            style="
-              display: none;
-              margin-top: 20px;
-              border-top: 1px solid #eee;
-              padding-top: 15px;
-            "
-          >
-            <h3>Vincular Aluno (Nome ou Matrícula)</h3>
-            <input
-              type="text"
-              id="alunoEmprestimo"
-              placeholder="Quem está levando o livro?"
-            />
+          <div id="areaEmprestimo" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <div id="bookDetails">
+              <p><strong>Autor:</strong> <span id="detalheAutor"></span></p>
+              <p><strong>Categoria:</strong> <span id="detalheCategoria"></span></p>
+              <p><strong>Status:</strong> <span id="detalheStatus"></span></p>
+            </div>
+
+            <h3>👤 Vincular Aluno</h3>
+            <input type="text" id="alunoEmprestimo" placeholder="Nome ou matrícula..." autocomplete="off" />
+            <ul id="studentSuggestions"></ul>
             <input type="hidden" id="idBookSelecionado" />
+            <input type="hidden" id="matriculaAlunoSelecionado" />
+
             <button id="btnLend" type="submit">Confirmar Empréstimo</button>
           </div>
         </form>
       </div>
-    </div>
-    <div id="footer-placeholder"></div>
+
+      <div id="formdev">
+        <form id="formpostdev">
+          <h3>↩️ Devolução de Livro</h3>
+          <input type="text" id="searchDevolucao" placeholder="Digite o título do livro emprestado..." autocomplete="off" />
+          <ul id="suggestionsDevolucao"></ul>
+
+          <div id="areaConfirmacaoDevolucao" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <div id="devDetails" class="book-details-card">
+              <p><strong>📖 Livro:</strong> <span id="devTitulo"></span></p>
+              <p><strong>👤 Aluno:</strong> <span id="devAluno"></span></p>
+              <p><strong>📅 Emprestado em:</strong> <span id="devData"></span></p>
+            </div>
+            <input type="hidden" id="idLivroDevolucao" />
+            <button type="button" id="devlivro" class="btn-success">Confirmar Recebimento</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="listagemGeral" style="display: none; flex-direction: column; gap: 30px;">
+          <div>
+              <h3>📚 Livros Cadastrados</h3>
+              <table id="tabelaLivros" class="tabela-estilizada">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Título</th>
+                          <th>Autor</th>
+                          <th>Qtd</th>
+                          <th>Status</th>
+                      </tr>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+
+          <div>
+              <h3>👨‍🎓 Alunos Cadastrados</h3>
+              <table id="tabelaAlunos" class="tabela-estilizada">
+                  <thead>
+                      <tr>
+                          <th>Matrícula</th>
+                          <th>Nome</th>
+                          <th>E-mail</th>
+                          <th>Série</th>
+                      </tr>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+      </div>
+    </div> <div id="footer-placeholder"></div>
+
     <script src="main.js"></script>
   </body>
 </html>

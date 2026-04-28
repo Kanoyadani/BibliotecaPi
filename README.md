@@ -1,15 +1,16 @@
+Aqui está o seu **README.md** atualizado com todas as novas funcionalidades que implementamos, incluindo o campo de quantidade, o novo sistema de devolução profissional, a listagem geral e as correções na estrutura do banco de dados.
 
 ---
 
 # 📚 Sistema de Gestão Bibliotecária - CMEI
 
-Este é um sistema Fullstack desenvolvido para o gerenciamento de acervo e empréstimos da biblioteca do **CMEI Dona Maria Benedita Garcia da Silva**. O projeto permite o cadastro de livros, alunos e o vínculo de empréstimos com persistência em banco de dados relacional.
+Este é um sistema Fullstack desenvolvido para o gerenciamento de acervo e empréstimos da biblioteca do **CMEI Dona Maria Benedita Garcia da Silva**. O projeto permite o controle total de livros (com saldo de estoque), cadastro de alunos, empréstimos e devoluções com persistência em PostgreSQL.
 
 ## 🚀 Tecnologias Utilizadas
 
-* **Frontend:** HTML5, CSS3 (Modern UI), JavaScript Vanilla (AJAX/Hash Routing).
+* **Frontend:** HTML5, CSS3 (Modern UI), JavaScript Vanilla (AJAX/Fetch API / Hash Routing).
 * **Backend:** Node.js, Express.js.
-* **Banco de Dados:** PostgreSQL.
+* **Banco de Dados:** PostgreSQL (Relacional).
 * **Infraestrutura:** Docker.
 
 ---
@@ -31,7 +32,7 @@ cd BibliotecaPi-main
 ```
 
 ### 2. Configurar o Banco de Dados (Docker)
-Para subir o container do PostgreSQL com as credenciais já configuradas no `db.js`:
+Para subir o container do PostgreSQL com as credenciais configuradas:
 ```bash
 sudo docker run --name bibliotecapi-db \
   -e POSTGRES_PASSWORD=123siltec321 \
@@ -45,55 +46,60 @@ Acesse o terminal do banco de dados:
 ```bash
 sudo docker exec -it bibliotecapi-db psql -U postgres
 ```
-Dentro do terminal do Postgres, cole os comandos do arquivo `db.sql` ou execute:
+Dentro do terminal do Postgres, cole os seguintes comandos para criar a estrutura atualizada:
+
 ```sql
 CREATE TABLE books (
-    idbook SERIAL PRIMARY KEY,
+    idbook INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
-    Category VARCHAR(100)
+    Category VARCHAR(100) NOT NULL,
+    quantidade INT DEFAULT 1,
+    emprestador BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE alunos (
-    id SERIAL PRIMARY KEY,
+    id_aluno INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
-    matricula VARCHAR(50),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    matricula VARCHAR(50) UNIQUE NOT NULL,
     serie VARCHAR(20),
-    registro VARCHAR(50)
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE emprestimos (
-    idEmprestimo SERIAL PRIMARY KEY,
-    idbook INTEGER NOT NULL,
-    nome_aluno VARCHAR(255) NOT NULL,
-    data_emprestimo TIMESTAMP DEFAULT NOW(),
-    CONSTRAINT fk_book FOREIGN KEY (idbook) REFERENCES books(idbook)
+    id_emprestimo INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    idbook INT NOT NULL,
+    nome_aluno VARCHAR(255),
+    email VARCHAR(255),
+    matricula VARCHAR(50),
+    serie VARCHAR(20),
+    data_emprestimo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_devolucao TIMESTAMP,
+    CONSTRAINT fk_livro FOREIGN KEY (idbook) REFERENCES books(idbook) ON DELETE CASCADE
 );
 ```
 
-### 4. Instalar as dependências do Node.js
+### 4. Instalar as dependências e Iniciar
 ```bash
 npm install
-```
-
-### 5. Iniciar o Servidor
-```bash
 node server.js
 ```
-O servidor estará rodando em: `http://localhost:3000/main.html`
+O sistema estará disponível em: `http://localhost:3000`
 
 ---
 
 ## 💡 Funcionalidades Implementadas
 
-* **Navegação Inteligente:** Sistema de rotas via `#hash` que mantém o usuário na mesma tela após o recarregamento (F5).
-* **UI/UX Moderna:** Interface limpa, responsiva, com cabeçalho e rodapé fixos.
-* **Cadastro Flexível:** Seleção de categorias com suporte a campos customizados ("Outro").
-* **Autocomplete:** Busca dinâmica de livros para facilitar a seleção no momento do empréstimo.
-* **Segurança de Dados:** Vinculação técnica entre tabelas de livros e registros de saída.
+* **Navegação por Hash (#):** Sistema de rotas Single Page Application (SPA) que permite recarregar a página sem perder a aba atual.
+* **Gestão de Estoque:** Cadastro de livros incluindo o campo de **Quantidade** para controle de acervo.
+* **Empréstimo Inteligente:** Busca dinâmica de livros com autocomplete e vinculação automática dos dados do aluno via matrícula.
+* **Devolução Profissional:** Fluxo de busca de livros emprestados com visualização de detalhes antes da confirmação do recebimento.
+* **Listagem Geral:** Aba dedicada para visualização em tempo real de todos os livros (com status e saldo) e alunos cadastrados.
+* **Validações Robustas:** Tratamento de erros para campos vazios, e-mails inválidos e matrículas duplicadas tanto no Front quanto no Back-end.
+* **Arquitetura Limpa:** Componentização de Header e Footer em arquivos separados carregados via JavaScript.
 
 ## 📄 Licença
-Este projeto é para fins acadêmicos e de gestão escolar local.
+Este projeto é para fins acadêmicos e de gestão escolar local do CMEI Dona Maria Benedita Garcia da Silva.
 
 ---
