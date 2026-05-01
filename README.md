@@ -1,6 +1,4 @@
-Aqui está o seu **README.md** atualizado com todas as novas funcionalidades que implementamos, incluindo o campo de quantidade, o novo sistema de devolução profissional, a listagem geral e as correções na estrutura do banco de dados.
 
----
 
 # 📚 Sistema de Gestão Bibliotecária - CMEI
 
