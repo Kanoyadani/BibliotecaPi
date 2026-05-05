@@ -53,6 +53,7 @@ CREATE TABLE books (
     author VARCHAR(255) NOT NULL,
     Category VARCHAR(100) NOT NULL,
     quantidade INT DEFAULT 1,
+    localizacao VARCHAR(100),
     emprestador BOOLEAN DEFAULT FALSE
 );
 
@@ -62,6 +63,7 @@ CREATE TABLE alunos (
     email VARCHAR(255) UNIQUE NOT NULL,
     matricula VARCHAR(50) UNIQUE NOT NULL,
     serie VARCHAR(20),
+    celular VARCHAR(20),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
