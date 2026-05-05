@@ -15,147 +15,156 @@ app.use(express.static(__dirname)); // Serve CSS, JS e imagens da pasta raiz
 
 // Rota Principal - Entrega o Front-end
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "main.html"));
+    res.sendFile(path.join(__dirname, "main.html"));
 });
 
 // ================= ROTAS DE LIVROS =================
 
-// Validar Cadastro de Livro
+// Cadastrar Livro
 app.post("/livros", async (req, res) => {
-  const { title, author, category, quantidade } = req.body;
-  if (!title || !author || !category || !quantidade) {
-    return res.status(400).json({ erro: "Todos os campos, incluindo quantidade, são obrigatórios!" });
-  }
-  try {
-    const livro = await criarLivro(req.body);
-    res.status(201).json(livro);
-  } catch (err) {
-    res.status(500).json({ erro: "Erro ao salvar livro no banco." });
-  }
-});
-
-// Buscar livros (Autocomplete)
-app.get("/livros", async (req, res) => {
-  const { q } = req.query;
-  if (!q || q.length < 2) return res.json([]);
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM books WHERE title ILIKE $1 LIMIT 10",
-      [`%${q}%`]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error("❌ ERRO AO BUSCAR LIVROS:", err);
-    res.status(500).json({ erro: "Erro ao buscar livros" });
-  }
-});
-
-// Marcar livro como emprestado
-app.patch("/livros/:id", async (req, res) => {
-  const idbook = req.params.id;
-  try {
-    const sql = `
-      UPDATE books
-      SET emprestador = true
-      WHERE idbook = $1
-      RETURNING *;
-    `;
-    const result = await pool.query(sql, [idbook]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "Livro não encontrado" });
+    const { title, author, category, localizacao, quantidade } = req.body;
+    
+    // Validação de segurança no backend (incluindo o novo campo localizacao)
+    if (!title || !author || !category || !localizacao || !quantidade) {
+        return res.status(400).json({ erro: "Preencha todos os campos do livro!" });
     }
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error("❌ ERRO AO ATUALIZAR STATUS DO LIVRO:", err);
-    res.status(500).json({ error: err.message });
-  }
+
+    try {
+        const livro = await criarLivro(req.body);
+        res.status(201).json(livro);
+    } catch (err) {
+        console.error("❌ ERRO AO SALVAR LIVRO:", err);
+        res.status(500).json({ erro: "Erro interno ao salvar livro no banco." });
+    }
+});
+
+// Buscar livros (Autocomplete E Listagem Geral)
+app.get("/livros", async (req, res) => {
+    const { q } = req.query;
+    try {
+        let result;
+        if (q && q.trim() !== "") {
+            // Caso 1: Autocomplete (busca parcial por título)
+            result = await pool.query(
+                "SELECT * FROM books WHERE title ILIKE $1 ORDER BY title ASC LIMIT 10",
+                [`%${q}%`]
+            );
+        } else {
+            // Caso 2: Listagem Geral (traz tudo)
+            result = await pool.query("SELECT * FROM books ORDER BY title ASC");
+        }
+        res.json(result.rows);
+    } catch (err) {
+        console.error("❌ ERRO AO BUSCAR LIVROS:", err);
+        res.status(500).json({ erro: "Erro ao carregar a lista de livros." });
+    }
 });
 
 // ================= ROTAS DE ALUNOS =================
 
-// Criar novo aluno
-// Validar Cadastro de Aluno
+// Cadastrar Aluno
 app.post("/alunos", async (req, res) => {
-  const { nome, matricula, email } = req.body;
-  if (!nome || !matricula || !email) {
-    return res.status(400).json({ erro: "Nome, Matrícula e Email são obrigatórios!" });
-  }
-  try {
-    const aluno = await criaraluno(req.body);
-    res.status(201).json(aluno);
-  } catch (err) {
-    if (err.code === '23505') { // Erro de duplicidade do Postgres
-      return res.status(400).json({ erro: "Matrícula ou Email já cadastrados!" });
+    const { nome, email, celular, matricula, serie } = req.body;
+    
+    // Validação de segurança no backend (incluindo celular e série)
+    if (!nome || !email || !celular || !matricula || !serie) {
+        return res.status(400).json({ erro: "Preencha todos os campos do aluno!" });
     }
-    res.status(500).json({ erro: "Erro ao cadastrar aluno." });
-  }
+
+    try {
+        const aluno = await criaraluno(req.body);
+        res.status(201).json(aluno);
+    } catch (err) {
+        if (err.code === '23505') { // Erro de duplicidade no Postgres
+            return res.status(400).json({ erro: "Esta Matrícula ou Email já está cadastrado!" });
+        }
+        console.error("❌ ERRO AO SALVAR ALUNO:", err);
+        res.status(500).json({ erro: "Erro interno ao cadastrar aluno." });
+    }
 });
 
-// Buscar aluno por matrícula
+// Buscar alunos (Autocomplete E Listagem Geral)
 app.get("/alunos", async (req, res) => {
-  const { q } = req.query;
-  if (!q || q.length < 1) return res.json([]);
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM alunos WHERE matricula = $1",
-      [q]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error("❌ ERRO AO BUSCAR ALUNO:", err);
-    res.status(500).json({ erro: "Erro ao buscar aluno" });
-  }
+    const { q } = req.query;
+    try {
+        let result;
+        if (q && q.trim() !== "") {
+            // Busca por matrícula ou parte do nome
+            result = await pool.query(
+                "SELECT * FROM alunos WHERE matricula = $1 OR nome ILIKE $2 LIMIT 10",
+                [q, `%${q}%`]
+            );
+        } else {
+            // Listagem Geral
+            result = await pool.query("SELECT * FROM alunos ORDER BY nome ASC");
+        }
+        res.json(result.rows);
+    } catch (err) {
+        console.error("❌ ERRO AO BUSCAR ALUNO:", err);
+        res.status(500).json({ erro: "Erro ao carregar a lista de alunos." });
+    }
 });
 
-// ================= ROTAS DE EMPRÉSTIMO =================
+// ================= ROTAS DE EMPRÉSTIMO E DEVOLUÇÃO =================
 
-// Registrar empréstimo
-app.post("/emprestimoservice", async (req, res) => {
-  try {
-    const emprestimo = await criaremprestimo(req.body);
-    res.status(201).json(emprestimo);
-  } catch (err) {
-    console.error("❌ ERRO AO REGISTRAR EMPRÉSTIMO:", err);
-    res.status(500).json({ erro: err.message });
-  }
-});
+// Registrar empréstimo (Rota corrigida para bater com o frontend)
+app.post("/emprestimos", async (req, res) => {
+    const { idbook, matricula } = req.body;
 
-// Registrar devolução de livro
-app.patch("/devolver/:id", async (req, res) => {
-  const idbook = req.params.id;
-
-  try {
-    // 1. Atualiza o status do livro para disponível
-    await pool.query(
-      "UPDATE books SET emprestador = false WHERE idbook = $1",
-      [idbook]
-    );
-
-    // 2. Finaliza o registro de empréstimo com a data atual
-    const result = await pool.query(
-      `UPDATE emprestimos
-       SET data_devolucao = NOW()
-       WHERE idbook = $1 AND data_devolucao IS NULL
-       RETURNING *`,
-      [idbook]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "Empréstimo ativo não encontrado para este livro" });
+    if (!idbook || !matricula) {
+        return res.status(400).json({ erro: "Dados insuficientes! Selecione o livro e o aluno." });
     }
 
-    res.json({ message: "Livro devolvido com sucesso!" });
-  } catch (err) {
-    console.error("❌ ERRO NA DEVOLUÇÃO:", err);
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        const emprestimo = await criaremprestimo(req.body);
+        res.status(201).json(emprestimo);
+    } catch (err) {
+        console.error("❌ ERRO AO REGISTRAR EMPRÉSTIMO:", err);
+        // Retorna a mensagem amigável vinda do service (ex: "Livro indisponível")
+        res.status(400).json({ erro: err.message });
+    }
+});
+
+// Registrar devolução
+app.patch("/devolver/:id", async (req, res) => {
+    const idbook = req.params.id;
+
+    try {
+        // 1. Adiciona +1 na quantidade do livro e garante que o status fique como Disponível (false)
+        const updateBook = await pool.query(
+            `UPDATE books 
+             SET quantidade = quantidade + 1, 
+                 emprestador = false 
+             WHERE idbook = $1 RETURNING *`,
+            [idbook]
+        );
+
+        if (updateBook.rowCount === 0) {
+            return res.status(404).json({ erro: "Livro não encontrado no sistema." });
+        }
+
+        // 2. Finaliza o registro de empréstimo
+        const updateEmprestimo = await pool.query(
+            `UPDATE emprestimos
+             SET data_devolucao = NOW()
+             WHERE idbook = $1 AND data_devolucao IS NULL
+             RETURNING *`,
+            [idbook]
+        );
+
+        if (updateEmprestimo.rowCount === 0) {
+            return res.status(404).json({ erro: "Nenhum empréstimo ativo encontrado para este livro." });
+        }
+
+        res.json({ message: "Livro devolvido com sucesso!" });
+    } catch (err) {
+        console.error("❌ ERRO NA DEVOLUÇÃO:", err);
+        res.status(500).json({ erro: "Erro ao processar a devolução no banco de dados." });
+    }
 });
 
 // Inicialização do Servidor
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });

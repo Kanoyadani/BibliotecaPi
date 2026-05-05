@@ -1,5 +1,5 @@
 /* ========================================================
-   VARIÁVEIS GLOBAIS (Facilita a manutenção do tema)
+   VARIÁVEIS GLOBAIS
    ======================================================== */
 :root {
     --primary-color: #007bff;
@@ -36,25 +36,30 @@ body {
     min-height: 100vh;
     background-color: var(--bg-color); 
     color: var(--text-main);
-    padding-top: 90px;  
-    padding-bottom: 70px;
+    padding-top: 100px;  
+    padding-bottom: 80px;
 }
 
 /* ========================================================
-   ESTRUTURA PRINCIPAL (O CARD CENTRAL)
+   ESTRUTURA PRINCIPAL
    ======================================================== */
 .main-container {
     background-color: var(--card-bg);
     padding: 40px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
-    width: 100%;
-    max-width: 600px; /* Um pouco mais largo para acomodar os botões lado a lado */
+    width: 95%;
+    max-width: 650px;
     text-align: center;
-    margin-top: 20px;
     margin-bottom: 20px;
     animation: fadeIn 0.5s ease-in-out;
-    position: relative; /* Importante para as listas de sugestões */
+    position: relative;
+    transition: max-width 0.4s ease-in-out;
+}
+
+/* Expande o container quando a listagem geral está visível */
+.main-container:has(#listagemGeral:not([style*="display: none"])) {
+    max-width: 1000px;
 }
 
 @keyframes fadeIn {
@@ -76,12 +81,6 @@ header {
     z-index: 1000;   
 }
 
-header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
 footer {
     position: fixed;
     bottom: 0; left: 0; width: 100%;
@@ -91,7 +90,6 @@ footer {
     padding: 15px 20px;
     font-size: 14px;
     z-index: 1000;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* ========================================================
@@ -100,7 +98,7 @@ footer {
 .nav-buttons {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 25px;
     padding-bottom: 20px;
@@ -111,58 +109,32 @@ button {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px 18px;
+    padding: 10px 16px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
 }
 
 button:hover {
     background-color: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-button:active {
-    transform: scale(0.97);
-}
+button:active { transform: scale(0.98); }
 
-button:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
-
-/* Botões de Ação Específicos */
-form button[type="submit"] {
-    margin-top: 25px;
-    width: 100%;
-    background-color: var(--info-color);
-    padding: 14px;
-    font-size: 16px;
-}
-form button[type="submit"]:hover { background-color: var(--info-hover); }
-
-#btnLend, #devlivro { background-color: var(--success-color); margin-top: 10px;}
-#btnLend:hover:not(:disabled), #devlivro:hover { background-color: var(--success-hover); }
+/* Botões de Cores Diferentes */
+#btnLend, #devlivro, .btn-success { background-color: var(--success-color); }
+#btnLend:hover, #devlivro:hover, .btn-success:hover { background-color: var(--success-hover); }
 
 /* ========================================================
    FORMULÁRIOS E INPUTS
    ======================================================== */
-form {
-    text-align: left;
-    width: 100%;
-    animation: fadeIn 0.4s ease-in-out;
-}
-
 h3 {
     margin-top: 20px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-size: 13px;
     color: var(--text-muted);
     text-transform: uppercase; 
@@ -170,161 +142,75 @@ h3 {
     font-weight: 700;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="date"],
-select {
+input, select {
     width: 100%;
-    padding: 12px 15px;
+    padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-size: 15px;
     background-color: var(--input-bg);
-    color: var(--text-main);
-    transition: all 0.3s ease;
-}
-
-input:focus, select:focus {
-    background-color: #ffffff;
-    border-color: #80bdff;
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15); 
-}
-
-/* Oculta as seções por padrão */
-#formadd, #addalunocreate, #formbausca, #formdev {
-    display: none; 
-    flex-direction: column;
-}
-
-/* ========================================================
-   UI DA BUSCA E EMPRÉSTIMO
-   ======================================================== */
-/* Listas de Sugestões */
-#suggestions, #studentSuggestions {
-    border: 1px solid var(--border-color);
-    border-top: none;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-radius: 0 0 8px 8px;
-    background-color: white;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    
-    /* Faz a lista sobrepor o conteúdo abaixo sem empurrar a tela */
-    position: absolute;
-    width: calc(100% - 80px); /* Ajusta a largura baseada no padding do main-container */
-    z-index: 100;
-}
-
-#suggestions li, #studentSuggestions li {
-    padding: 12px 15px;
-    cursor: pointer;
-    text-align: left;
-    border-bottom: 1px solid var(--bg-color);
-    font-size: 14px;
-    color: var(--text-main);
-    transition: background-color 0.2s ease;
-}
-
-#suggestions li:last-child, #studentSuggestions li:last-child {
-    border-bottom: none;
-}
-
-#suggestions li:hover, #studentSuggestions li:hover {
-    background: #e9ecef;
-    color: var(--primary-hover);
-    font-weight: 600;
-}
-
-/* Card de Detalhes do Livro Selecionado */
-#bookDetails {
-    background: var(--input-bg);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 0.95em;
-    border-left: 5px solid var(--primary-color);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
-}
-
-#bookDetails p {
     margin-bottom: 5px;
 }
 
-#bookDetails p:last-child {
-    margin-bottom: 0;
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+form button[type="submit"] {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--info-color);
 }
 
 /* ========================================================
-   SISTEMA DE NOTIFICAÇÃO (TOAST)
+   LISTAS DE SUGESTÕES (AUTOCOMPLETE)
    ======================================================== */
-#toast {
-    position: fixed;
-    top: 25px;
-    right: 25px;
-    padding: 16px 24px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-    z-index: 2000;
-    display: none;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    animation: slideInRight 0.4s ease forwards;
-}
-
-#toast.success { background-color: var(--success-color); }
-#toast.error { background-color: var(--danger-color); border-left: 5px solid #bd2130; }
-
-@keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-/* Container da lista de sugestões */
-#suggestions, #suggestionsDevolucao {
-    position: absolute; /* Faz a lista flutuar */
-    width: 100%;
-    max-width: 520px; /* Ajuste conforme a largura do seu input */
-    background-color: white;
-    border: 1px solid #ced4da;
+#suggestions, #studentSuggestions, #suggestionsDevolucao {
+    position: absolute;
+    width: calc(100% - 80px);
+    background: white;
+    border: 1px solid var(--border-color);
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 1000;
     list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px;
+    z-index: 1100;
+    max-height: 180px;
     overflow-y: auto;
+    box-shadow: var(--shadow-md);
 }
 
-/* Itens da lista */
-#suggestions li, #suggestionsDevolucao li {
-    padding: 12px 15px;
+#suggestions li, #suggestionsDevolucao li, #studentSuggestions li {
+    padding: 12px;
     cursor: pointer;
-    border-bottom: 1px solid #f1f1f1;
     text-align: left;
-    font-size: 14px;
-    transition: background 0.2s;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 #suggestions li:hover, #suggestionsDevolucao li:hover {
     background-color: #f8f9fa;
-    color: #007bff;
+    color: var(--primary-color);
 }
 
-/* Card de detalhes que aparece após selecionar */
-.book-details-card {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 5px solid #28a745;
-    margin-top: 15px;
+/* ========================================================
+   TABELAS E LISTAGEM GERAL
+   ======================================================== */
+#listagemGeral {
+    width: 100%;
+}
+
+#listagemGeral h3 {
     text-align: left;
+    font-size: 16px;
+    color: var(--primary-color);
+    border-left: 4px solid var(--primary-color);
+    padding-left: 10px;
+    margin-top: 30px;
+}
+
+.tabela-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Garante que a tabela não quebre em telas pequenas */
 }
 
 .tabela-estilizada {
@@ -332,23 +218,73 @@ input:focus, select:focus {
     border-collapse: collapse;
     margin-top: 10px;
     background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 14px;
 }
 
-.tabela-estilizada th, .tabela-estilizada td {
+.tabela-estilizada thead th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.tabela-estilizada td {
     padding: 12px 15px;
-    text-align: left;
     border-bottom: 1px solid #eee;
-}
-
-.tabela-estilizada th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-    color: #333;
+    color: var(--text-main);
+    white-space: nowrap; /* Evita que o status quebre linha */
 }
 
 .tabela-estilizada tr:hover {
-    background-color: #f1f4f9;
+    background-color: #f8fbff;
+}
+
+/* Alinhamento de colunas da tabela */
+.tabela-estilizada td { text-align: left; } /* Título e Autor */
+.tabela-estilizada td:nth-child(1), /* ID */
+.tabela-estilizada td:nth-child(4), /* Qtd */
+.tabela-estilizada td:nth-child(5)  /* Status */ {
+    text-align: center;
+}
+
+/* ========================================================
+   CARDS DE DETALHES
+   ======================================================== */
+#bookDetails, .book-details-card {
+    background: var(--input-bg);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 5px solid var(--primary-color);
+    margin: 15px 0;
+    text-align: left;
+}
+
+/* Estilo específico para o card de devolução (verde) */
+.book-details-card {
+    border-left-color: var(--success-color);
+}
+
+#toast {
+    position: fixed;
+    top: 100px; /* Garante que fique visível abaixo do header */
+    right: 20px;
+    min-width: 300px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    z-index: 9999; /* Valor bem alto para ficar na frente de tudo */
+    display: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Classes que a função showToast adiciona */
+.success { background-color: #28a745 !important; }
+.error { background-color: #dc3545 !important; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }

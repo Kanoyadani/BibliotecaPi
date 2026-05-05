@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,15 +11,14 @@
 
     <div class="main-container">
       <div class="nav-buttons">
-        <button id="AddBook" onclick="addbook()">📚 Novo Livro</button>
-        <button id="addaluno" onclick="addaluno()">👨‍🎓 Novo Aluno</button>
-        <button id="Busca" onclick="buscabook()">🤝 Empréstimo</button>
-        <button id="devolver" onclick="devolver()">↩️ Devolução</button>
-        <button id="Listagem" onclick="verListagem()">📋 Listagem Geral</button>
+        <button onclick="addbook()">📚 Novo Livro</button>
+        <button onclick="addaluno()">👨‍🎓 Novo Aluno</button>
+        <button onclick="buscabook()">🤝 Empréstimo</button>
+        <button onclick="devolver()">↩️ Devolução</button>
+        <button onclick="verListagem()">📋 Listagem Geral</button>
       </div>
-
       <div id="toast"></div>
-
+      
       <div id="formadd">
         <form id="formbook">
           <h3>📘 Novo Livro</h3>
@@ -28,43 +27,24 @@
           <h3>✍️ Autor</h3>
           <input type="text" id="authorbook" placeholder="Nome do Autor" required />
           
+          <!-- NOVO CAMPO: LOCALIZAÇÃO -->
+          <h3>📍 Localização / Estante</h3>
+          <input type="text" id="localizacaolivro" placeholder="Ex: Corredor B, Estante 4" required />
+          
           <h3>🔢 Quantidade</h3>
-          <input type="number" id="quantidadelivro" placeholder="Ex: 5" min="1" value="1" required />
+          <input type="number" id="quantidadelivro" min="1" value="1" required />
           
           <h3>📂 Categoria</h3>
           <select id="CategoriaSelect" onchange="toggleOutroInput()" required>
             <option value="" disabled selected>Selecione uma categoria</option>
-            <optgroup label="Ficção">
-              <option value="Romance">Romance</option>
-              <option value="Fantasia">Fantasia</option>
-              <option value="Ficção Científica">Ficção Científica</option>
-              <option value="Suspense/Policial">Suspense/Policial</option>
-              <option value="Terror/Horror">Terror/Horror</option>
-              <option value="Distopia">Distopia</option>
-              <option value="Aventura">Aventura</option>
-              <option value="Conto">Conto</option>
-              <option value="Novela">Novela</option>
-            </optgroup>
-            <optgroup label="Não Ficção">
-              <option value="Biografia/Autobiografia">Biografia/Autobiografia</option>
-              <option value="Autoajuda">Autoajuda</option>
-              <option value="Didáticos">Didáticos</option>
-              <option value="Religiosos">Religiosos</option>
-              <option value="História/Política/Filosofia">História/Política/Filosofia</option>
-            </optgroup>
-            <optgroup label="Outros Gêneros">
-              <option value="Poesia/Lírico">Poesia/Lírico</option>
-              <option value="Histórias em Quadrinhos (HQs/Mangás)">Histórias em Quadrinhos (HQs/Mangás)</option>
-              <option value="Teatro (Dramático)">Teatro (Dramático)</option>
-            </optgroup>
+            <option value="Romance">Romance</option>
+            <option value="Fantasia">Fantasia</option>
+            <option value="Didáticos">Didáticos</option>
             <option value="Outro">Outro</option>
           </select>
-
           <div id="outroCategoriaDiv" style="display: none; margin-top: 10px">
-            <h3>Especifique a Categoria</h3>
-            <input type="text" id="CategoriaOutro" placeholder="Digite o gênero" />
+            <input type="text" id="CategoriaOutro" placeholder="Especifique a categoria" />
           </div>
-
           <button type="submit">Cadastrar Livro</button>
         </form>
       </div>
@@ -75,97 +55,73 @@
           <input type="text" id="nomealuno" placeholder="Nome completo" required />
           
           <h3>📧 Email</h3>
-          <input type="email" id="email" placeholder="email@exemplo.com" required />
+          <input type="email" id="emailaluno" placeholder="email@exemplo.com" required />
+          
+          <!-- NOVO CAMPO: CELULAR/WHATSAPP -->
+        <h3 style="display: flex; align-items: center; gap: 6px;justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#25D366" viewBox="0 0 16 16">   <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.005-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
+          Celular / WhatsApp</h3>
+          <input type="tel" id="celularaluno" placeholder="(11) 99999-9999" required />
           
           <h3>🆔 Matrícula</h3>
-          <input type="text" id="matricula" placeholder="Número da matrícula" required />
+          <input type="text" id="matriculaaluno" placeholder="Número da matrícula" required />
           
           <h3>🏫 Série</h3>
-          <input type="text" id="serie" placeholder="Ex: 2º Ano B" required />
-          
-          <h3>📅 Data de Registro</h3>
-          <input type="date" id="registro" required />
-          
+          <input type="text" id="seriealuno" placeholder="Ex: 2º Ano B" required />
           <button type="submit">Cadastrar Aluno</button>
         </form>
       </div>
 
       <div id="formbausca">
-        <form id="formSearchBook">
+        <form id="formLend">
           <h3>🔍 Pesquisar Livro</h3>
           <input type="text" id="searchBook" placeholder="Digite o título..." autocomplete="off" />
           <ul id="suggestions"></ul>
 
-          <div id="areaEmprestimo" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          <div id="areaEmprestimo" style="display: none; margin-top: 20px;">
             <div id="bookDetails">
               <p><strong>Autor:</strong> <span id="detalheAutor"></span></p>
-              <p><strong>Categoria:</strong> <span id="detalheCategoria"></span></p>
               <p><strong>Status:</strong> <span id="detalheStatus"></span></p>
             </div>
-
-            <h3>👤 Vincular Aluno</h3>
-            <input type="text" id="alunoEmprestimo" placeholder="Nome ou matrícula..." autocomplete="off" />
+            <h3>👤 Vincular Aluno (Matrícula)</h3>
+            <input type="text" id="alunoEmprestimo" placeholder="Digite a matrícula do aluno..." autocomplete="off" />
             <ul id="studentSuggestions"></ul>
+            
             <input type="hidden" id="idBookSelecionado" />
-            <input type="hidden" id="matriculaAlunoSelecionado" />
-
+            <input type="hidden" id="matriculaSelecionada" />
             <button id="btnLend" type="submit">Confirmar Empréstimo</button>
           </div>
         </form>
       </div>
 
       <div id="formdev">
-        <form id="formpostdev">
-          <h3>↩️ Devolução de Livro</h3>
-          <input type="text" id="searchDevolucao" placeholder="Digite o título do livro emprestado..." autocomplete="off" />
+        <form id="formReturn">
+          <h3>↩️ Devolução</h3>
+          <input type="text" id="searchDevolucao" placeholder="Título do livro emprestado..." autocomplete="off" />
           <ul id="suggestionsDevolucao"></ul>
-
-          <div id="areaConfirmacaoDevolucao" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-            <div id="devDetails" class="book-details-card">
+          <div id="areaConfirmacaoDevolucao" style="display: none;">
+            <div class="book-details-card">
               <p><strong>📖 Livro:</strong> <span id="devTitulo"></span></p>
-              <p><strong>👤 Aluno:</strong> <span id="devAluno"></span></p>
-              <p><strong>📅 Emprestado em:</strong> <span id="devData"></span></p>
             </div>
             <input type="hidden" id="idLivroDevolucao" />
-            <button type="button" id="devlivro" class="btn-success">Confirmar Recebimento</button>
+            <button type="submit" id="devlivro">Confirmar Recebimento</button>
           </div>
         </form>
       </div>
 
-      <div id="listagemGeral" style="display: none; flex-direction: column; gap: 30px;">
-          <div>
-              <h3>📚 Livros Cadastrados</h3>
-              <table id="tabelaLivros" class="tabela-estilizada">
-                  <thead>
-                      <tr>
-                          <th>ID</th>
-                          <th>Título</th>
-                          <th>Autor</th>
-                          <th>Qtd</th>
-                          <th>Status</th>
-                      </tr>
-                  </thead>
-                  <tbody></tbody>
-              </table>
-          </div>
-
-          <div>
-              <h3>👨‍🎓 Alunos Cadastrados</h3>
-              <table id="tabelaAlunos" class="tabela-estilizada">
-                  <thead>
-                      <tr>
-                          <th>Matrícula</th>
-                          <th>Nome</th>
-                          <th>E-mail</th>
-                          <th>Série</th>
-                      </tr>
-                  </thead>
-                  <tbody></tbody>
-              </table>
-          </div>
+      <div id="listagemGeral" style="display: none;">
+          <h3>📚 Livros</h3>
+          <table id="tabelaLivros" class="tabela-estilizada">
+              <thead><tr><th>ID</th><th>Título</th><th>Autor</th><th>Qtd</th><th>Localização</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+          </table>
+          <h3>👨‍🎓 Alunos</h3>
+          <table id="tabelaAlunos" class="tabela-estilizada">
+              <thead><tr><th>Matrícula</th><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Série</th></tr></thead>
+              <tbody></tbody>
+          </table>
       </div>
-    </div> <div id="footer-placeholder"></div>
-
+    </div>
+    <div id="footer-placeholder"></div>
     <script src="main.js"></script>
   </body>
 </html>

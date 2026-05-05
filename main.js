@@ -3,81 +3,45 @@ const rotas = {
   '#novo-aluno': 'addalunocreate',
   '#emprestimo': 'formbausca',
   '#devolucao': 'formdev',
-  '#listagem': 'listagemGeral' // Adicione esta linha
+  '#listagem': 'listagemGeral'
 };
 
-// Altere a função verListagem para mudar a hash
-function verListagem() {
-  window.location.hash = 'listagem';
-}
-
-async function carregarListagens() {
+// ================== COMPONENTES (HEADER/FOOTER) ==================
+async function carregarComponentes() {
   try {
-    // Busca Livros
-    const resLivros = await fetch("http://localhost:3000/livros");
-    const livros = await resLivros.json();
-    const corpoLivros = document.querySelector("#tabelaLivros tbody");
-    
-    if (corpoLivros) {
-      corpoLivros.innerHTML = livros.map(l => `
-        <tr>
-          <td>${l.idbook}</td>
-          <td>${l.title}</td>
-          <td>${l.author}</td>
-          <td>${l.quantidade || 1}</td>
-          <td>${l.emprestador ? "🔴 Emprestado" : "🟢 Disponível"}</td>
-        </tr>
-      `).join("");
-    }
-
-    // Busca Alunos
-    const resAlunos = await fetch("http://localhost:3000/alunos");
-    const alunos = await resAlunos.json();
-    const corpoAlunos = document.querySelector("#tabelaAlunos tbody");
-    
-    if (corpoAlunos) {
-      corpoAlunos.innerHTML = alunos.map(a => `
-        <tr>
-          <td>${a.matricula}</td>
-          <td>${a.nome}</td>
-          <td>${a.email}</td>
-          <td>${a.serie}</td>
-        </tr>
-      `).join("");
-    }
-  } catch (err) {
-    console.error("Erro ao carregar dados:", err);
-    alert("❌ Erro ao conectar com o servidor.");
+    const [h, f] = await Promise.all([
+      fetch("header.html"), 
+      fetch("footer.html")
+    ]);
+    document.getElementById("header-placeholder").innerHTML = await h.text();
+    document.getElementById("footer-placeholder").innerHTML = await f.text();
+  } catch (err) { 
+    console.error("Erro ao carregar componentes:", err); 
   }
 }
 
+// Função para exibir notificações bonitas
+function showToast(mensagem, tipo = "success") {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
 
+  toast.textContent = mensagem;
+  toast.className = ""; // Limpa classes anteriores
+  toast.classList.add(tipo); 
+  toast.style.display = "block";
 
-function gerenciarRotas() {
-  const hash = window.location.hash || '#novo-livro';
-  esconderTudo();
-
-  if (rotas[hash]) {
-    const elemento = document.getElementById(rotas[hash]);
-    if (elemento) elemento.style.display = "flex";
-    
-    // Se a rota for listagem, carrega os dados do banco
-    if (hash === '#listagem') {
-      carregarListagens();
-    }
-  }
+  // Esconde o toast após 3 segundos
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
 }
 
-window.addEventListener('hashchange', gerenciarRotas);
-
-// ================== CONTROLE DE TELAS ==================
+// ================== NAVEGAÇÃO E ROTAS ==================
 function esconderTudo() {
-  document.getElementById("formadd").style.display = "none";
-  document.getElementById("formbausca").style.display = "none";
-  document.getElementById("addalunocreate").style.display = "none";
-  document.getElementById("formdev").style.display = "none";
-  document.getElementById("listagemGeral").style.display = "none"; // Adicione esta linha
-
+  ['formadd', 'formbausca', 'addalunocreate', 'formdev', 'listagemGeral'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
   
   const areaEmp = document.getElementById("areaEmprestimo");
   if (areaEmp) areaEmp.style.display = "none";
@@ -86,144 +50,225 @@ function esconderTudo() {
   if (areaDev) areaDev.style.display = "none";
 }
 
+function gerenciarRotas() {
+  const hash = window.location.hash || '#novo-livro';
+  esconderTudo();
+  if (rotas[hash]) {
+    const elemento = document.getElementById(rotas[hash]);
+    if (elemento) {
+      elemento.style.display = "block";
+      if (hash === '#listagem') carregarListagens();
+    }
+  }
+}
+
+window.addEventListener('hashchange', gerenciarRotas);
+
+// Atalhos dos botões
 function addbook() { window.location.hash = 'novo-livro'; }
 function addaluno() { window.location.hash = 'novo-aluno'; }
 function buscabook() { window.location.hash = 'emprestimo'; }
 function devolver() { window.location.hash = 'devolucao'; }
+function verListagem() { window.location.hash = 'listagem'; }
 
 function toggleOutroInput() {
   const select = document.getElementById("CategoriaSelect");
   const divOutro = document.getElementById("outroCategoriaDiv");
-  if (select && divOutro) divOutro.style.display = (select.value === "Outro") ? "block" : "none";
+  divOutro.style.display = (select.value === "Outro") ? "block" : "none";
 }
 
-// ================== COMPONENTES ==================
-async function carregarComponentes() {
+// ================== CARREGAR LISTAGENS ==================
+async function carregarListagens() {
   try {
-    const [h, f] = await Promise.all([fetch("header.html"), fetch("footer.html")]);
-    document.getElementById("header-placeholder").innerHTML = await h.text();
-    document.getElementById("footer-placeholder").innerHTML = await f.text();
-  } catch (err) { console.error("Erro nos componentes:", err); }
+    const resL = await fetch("http://localhost:3000/livros");
+    const livros = await resL.json();
+    document.querySelector("#tabelaLivros tbody").innerHTML = livros.map(l => `
+      <tr>
+        <td>${l.idbook}</td>
+        <td>${l.title}</td>
+        <td>${l.author}</td>
+        <td>${l.quantidade}</td>
+        <td>${l.localizacao}</td>
+        <td>${l.emprestador ? "🔴 Emprestado" : "🟢 Disponível"}</td>
+      </tr>`).join("");
+
+    const resA = await fetch("http://localhost:3000/alunos");
+    const alunos = await resA.json();
+    document.querySelector("#tabelaAlunos tbody").innerHTML = alunos.map(a => `
+      <tr>
+        <td>${a.matricula}</td>
+        <td>${a.nome}</td>
+        <td>${a.email}</td>
+        <td>${a.celular}</td>
+        <td>${a.serie}</td>
+      </tr>`).join("");
+  } catch (err) { console.error(err); }
 }
 
-// ================== DOM READY ==================
+// ================== EVENTOS (DOM READY) ==================
 document.addEventListener("DOMContentLoaded", () => {
-  carregarComponentes();
-  gerenciarRotas();
+  carregarComponentes(); 
+  gerenciarRotas();      
 
-  // --- CADASTRO DE LIVRO ---
-  const formBook = document.getElementById("formbook");
-  if (formBook) {
-    formBook.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const catS = document.getElementById("CategoriaSelect").value;
-      const catO = document.getElementById("CategoriaOutro").value.trim();
-      const data = {
-        title: document.getElementById("titlebook").value.trim(),
-        author: document.getElementById("authorbook").value.trim(),
-        quantidade: parseInt(document.getElementById("quantidadelivro").value),
-        category: (catS === "Outro") ? catO : catS
-      };
-      try {
-        const res = await fetch("http://localhost:3000/livros", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error();
-        alert("✅ Livro cadastrado!");
-        formBook.reset();
-      } catch (err) { alert("❌ Erro ao cadastrar livro"); }
-    });
-  }
-
-  // --- BUSCA PARA DEVOLUÇÃO (O QUE ESTAVA FALTANDO) ---
-const inputDev = document.getElementById("searchDevolucao");
-const listDev = document.getElementById("suggestionsDevolucao");
-const areaDev = document.getElementById("areaConfirmacaoDevolucao");
-
-if (inputDev) {
-  inputDev.addEventListener("input", async () => {
-    const q = inputDev.value.trim();
-    listDev.innerHTML = ""; // Limpa a lista anterior
-    areaDev.style.display = "none"; // Esconde detalhes se mudar a busca
-
-    if (q.length < 2) return;
+  // CADASTRO LIVRO
+  document.getElementById("formbook").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const cat = document.getElementById("CategoriaSelect").value === "Outro" ? 
+                document.getElementById("CategoriaOutro").value : document.getElementById("CategoriaSelect").value;
+    
+    // OBJETO ATUALIZADO COM O CAMPO DE LOCALIZAÇÃO
+    const data = {
+      title: document.getElementById("titlebook").value.trim(),
+      author: document.getElementById("authorbook").value.trim(),
+      localizacao: document.getElementById("localizacaolivro").value.trim(),
+      quantidade: document.getElementById("quantidadelivro").value,
+      category: cat
+    };
 
     try {
-      const res = await fetch(`http://localhost:3000/livros?q=${q}`);
-      const books = await res.json();
-      
-      // Para testes, mostramos todos. No futuro, use .filter(b => b.emprestador)
-      books.forEach(book => {
-        const li = document.createElement("li");
-        li.innerHTML = `<span>📙</span> ${book.title} <strong>(ID: ${book.idbook})</strong>`;
-        
-        li.onclick = () => {
-          inputDev.value = book.title;
-          listDev.innerHTML = "";
-          areaDev.style.display = "block";
-          
-          document.getElementById("devTitulo").textContent = book.title;
-          document.getElementById("idLivroDevolucao").value = book.idbook;
-          
-          // Preenche dados fictícios ou busca no banco quem está com o livro
-          document.getElementById("devAluno").textContent = "Aluno Teste";
-          document.getElementById("devData").textContent = new Date().toLocaleDateString();
-        };
-        listDev.appendChild(li);
+      const res = await fetch("http://localhost:3000/livros", {
+        method: "POST", 
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
       });
-    } catch (err) { 
-      console.error("Erro na busca de devolução:", err); 
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.erro || "Erro ao cadastrar livro");
+
+      showToast("✅ Livro cadastrado com sucesso!", "success");
+      e.target.reset();
+    } catch (err) {
+      showToast("❌ " + err.message, "error");
     }
   });
+
+  // CADASTRO ALUNO
+  document.getElementById("formaluno").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    // OBJETO ATUALIZADO COM O CAMPO DE CELULAR
+    const data = {
+      nome: document.getElementById("nomealuno").value.trim(),
+      email: document.getElementById("emailaluno").value.trim(),
+      celular: document.getElementById("celularaluno").value.trim(),
+      matricula: document.getElementById("matriculaaluno").value.trim(),
+      serie: document.getElementById("seriealuno").value.trim()
+    };
+
+    try {
+      const res = await fetch("http://localhost:3000/alunos", {
+        method: "POST", 
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.erro || showToast("Erro ao cadastrar aluno"));
+
+      showToast("✅ Aluno cadastrado com sucesso!", "success");
+      e.target.reset();
+    } catch (err) {
+      showToast("❌ " + err.message, "error");
+    }
+  });
+
+  // BUSCA LIVRO EMPRÉSTIMO
+  document.getElementById("searchBook").addEventListener("input", async (e) => {
+    const q = e.target.value;
+    if (q.length < 2) return;
+    const res = await fetch(`http://localhost:3000/livros?q=${q}`);
+    const books = await res.json();
+    const sug = document.getElementById("suggestions");
+    sug.innerHTML = books.map(b => `<li onclick="selecionarLivro(${b.idbook}, '${b.title}', '${b.author}', ${b.emprestador})">${b.title}</li>`).join("");
+  });
+
+  // CONFIRMAR EMPRÉSTIMO
+  document.getElementById("formLend").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const idBook = document.getElementById("idBookSelecionado").value;
+    const matricula = document.getElementById("matriculaSelecionada").value;
+
+    if (!idBook || !matricula) {
+      showToast("❌ Selecione um livro e um aluno!", "error");
+      return;
+    }
+
+    try {
+      // Ajustado para a rota correta do backend (/emprestimos)
+      const res = await fetch("http://localhost:3000/emprestimos", {
+        method: "POST", 
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ idbook: idBook, matricula: matricula })
+      });
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.erro || "Erro no empréstimo");
+
+      showToast("🤝 Empréstimo realizado com sucesso!", "success");
+      setTimeout(() => location.reload(), 1500); 
+    } catch (err) {
+      showToast("❌ " + err.message, "error");
+    }
+  });
+
+  // DEVOLUÇÃO (BUSCA)
+  document.getElementById("searchDevolucao")?.addEventListener("input", async (e) => {
+      const q = e.target.value;
+      if (q.length < 2) return;
+      const res = await fetch(`http://localhost:3000/livros?q=${q}`);
+      const books = await res.json();
+      const sug = document.getElementById("suggestionsDevolucao");
+      sug.innerHTML = books.map(b => `<li onclick="selecionarDevolucao(${b.idbook}, '${b.title}')">📙 ${b.title}</li>`).join("");
+  });
+
+  // CONFIRMAR RECEBIMENTO (DEVOLUÇÃO)
+  document.getElementById("formReturn").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("idLivroDevolucao").value;
+    
+    try {
+      const res = await fetch(`http://localhost:3000/devolver/${id}`, { method: "PATCH" });
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.error || "Erro na devolução");
+
+      showToast("↩️ Livro devolvido com sucesso!", "success");
+      setTimeout(() => location.reload(), 1500);
+    } catch (err) {
+      showToast("❌ " + err.message, "error");
+    }
+  });
+});
+
+// ================== FUNÇÕES DE APOIO (GLOBAL) ==================
+
+function selecionarLivro(id, titulo, autor, emp) {
+  document.getElementById("searchBook").value = titulo;
+  document.getElementById("idBookSelecionado").value = id;
+  document.getElementById("detalheAutor").textContent = autor;
+  document.getElementById("detalheStatus").textContent = emp ? "🔴 Emprestado" : "🟢 Disponível";
+  document.getElementById("suggestions").innerHTML = "";
+  document.getElementById("areaEmprestimo").style.display = "block";
 }
 
-  // --- BOTÃO DE CONFIRMAR DEVOLUÇÃO ---
-  const btnDevFinal = document.getElementById("devlivro");
-  if (btnDevFinal) {
-    btnDevFinal.addEventListener("click", async () => {
-      const id = document.getElementById("idLivroDevolucao").value;
-      try {
-        const res = await fetch(`http://localhost:3000/devolver/${id}`, { method: "PATCH" });
-        if (!res.ok) throw new Error();
-        alert("✅ Livro devolvido com sucesso!");
-        window.location.reload();
-      } catch (err) { alert("❌ Erro na devolução"); }
-    });
-  }
-  
-  // --- LÓGICA DE EMPRÉSTIMO (EXISTENTE) ---
-  const inputBusca = document.getElementById("searchBook");
-  const listSugestoes = document.getElementById("suggestions");
-  const btnLend = document.getElementById("btnLend");
-  let selectedBook = null;
+function selecionarDevolucao(id, titulo) {
+    document.getElementById("searchDevolucao").value = titulo;
+    document.getElementById("idLivroDevolucao").value = id;
+    document.getElementById("devTitulo").textContent = titulo;
+    document.getElementById("suggestionsDevolucao").innerHTML = "";
+    document.getElementById("areaConfirmacaoDevolucao").style.display = "block";
+}
 
-  if (inputBusca) {
-    inputBusca.addEventListener("input", async () => {
-      const value = inputBusca.value.trim();
-      listSugestoes.innerHTML = "";
-      document.getElementById("areaEmprestimo").style.display = "none";
-      if (value.length < 2) return;
-      try {
-        const res = await fetch(`http://localhost:3000/livros?q=${value}`);
-        const books = await res.json();
-        books.forEach(book => {
-          const li = document.createElement("li");
-          li.textContent = `${book.title} (ID: ${book.idbook})`;
-          li.onclick = () => {
-            inputBusca.value = book.title;
-            listSugestoes.innerHTML = "";
-            document.getElementById("areaEmprestimo").style.display = "block";
-            document.getElementById("detalheAutor").textContent = book.author;
-            document.getElementById("detalheCategoria").textContent = book.category;
-            document.getElementById("detalheStatus").textContent = book.emprestador ? "🔴 Emprestado" : "🟢 Disponível";
-            btnLend.style.display = book.emprestador ? "none" : "block";
-            selectedBook = book;
-          };
-          listSugestoes.appendChild(li);
-        });
-      } catch (err) { console.error(err); }
-    });
-  }
+// Busca de aluno por matrícula no empréstimo
+document.addEventListener("input", async (e) => {
+    if (e.target.id === "alunoEmprestimo") {
+        const q = e.target.value;
+        if (q.length < 1) return;
+        const res = await fetch(`http://localhost:3000/alunos?q=${q}`);
+        const alunos = await res.json();
+        const sug = document.getElementById("studentSuggestions");
+        sug.innerHTML = alunos.map(a => 
+            `<li onclick="document.getElementById('matriculaSelecionada').value='${a.matricula}'; document.getElementById('alunoEmprestimo').value='${a.nome}'; document.getElementById('studentSuggestions').innerHTML=''">${a.nome} (${a.matricula})</li>`
+        ).join("");
+    }
 });
